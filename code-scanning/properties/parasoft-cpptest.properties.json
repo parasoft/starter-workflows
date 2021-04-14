@@ -1,0 +1,7 @@
+{
+    "name": "Parasoft C/C++test Code Analysis",
+    "creator": "Parasoft",
+    "description": "Code analysis with Parasoft C/C++test to ensure code quality, safety, security, and compliance with MISRA, AUTOSAR, CERT, and more.",
+    "iconName": "parasoft",
+    "categories": ["Code Scanning", "C", "C++"]
+}
