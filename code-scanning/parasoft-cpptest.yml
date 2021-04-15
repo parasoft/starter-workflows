@@ -65,11 +65,16 @@ jobs:
       uses: parasoft/run-cpptest-action@104f1c9cf6dbfd4b22e248a41d2e5a1e25e68b9e
       with:
         # Compiler configuration - ensure you specify the configuration that matches your compiler.
-        compilerConfig: 'gcc_9-64'
-        # [CMAKE]
-        # For CMake-based projects, use compile_commands.json file as the input for analysis: 
+        compilerConfig: 'gcc_9-64'        
+        
+        # Test configuration.
+        testConfig: 'builtin://Recommended Rules'
+        
+        # Input scope for analysis.
+        # [CMAKE] For CMake-based projects, use build/compile_commands.json file instead: 
         # input: build/compile_commands.json  
-        #
+        input: 'cpptestscan.bdf'
+
         # Uncomment if you are using C/C++test 2020.2 to generate a SARIF report:
         # reportFormat: xml,html,custom
         # additionalParams: '-property report.custom.extension=sarif -property report.custom.xsl.file=${PARASOFT_SARIF_XSL}'
