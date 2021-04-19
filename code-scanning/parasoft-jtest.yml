@@ -1,0 +1,74 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+# This workflow runs Parasoft Jtest to analyze code
+# and display results with GitHub code scanning alerts.
+# Parasoft Jtest is a testing tool that provides code analysis techniques
+# to improve code quality and ensure compliance with industry standards.
+# See https://github.com/parasoft/run-jtest-action for more information.
+
+name: Parasoft Jtest Code Analysis
+
+on:
+  push:
+    branches: [ $default-branch, $protected-branches ]
+  pull_request:
+    # The branches below must be a subset of the branches above.
+    branches: [ $default-branch ]
+  schedule:
+    - cron: $cron-weekly
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel.
+jobs:
+  # This workflow is made up of one job "run-jtest-action".
+  run-jtest-action:
+    # Specifies the name of the job.
+    name: Run code analysis with Jtest
+    # Specifies the type of runner that the job will run on.
+    runs-on: self-hosted
+    
+    # Steps represent a sequence of tasks that will be executed as part of the job.
+    steps:
+
+    # Checks out your repository, so that your job can access it.
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Create input for Jtest
+      run: ./mvnw clean install jtest:jtest "-Djtest.skip=true"
+
+#  For Gradle projects
+#  - name: Create input for Jtest
+#      run: ./gradlew clean build jtest -I /path/to/jtest/integration/gradle/init.gradle "-Djtest.skip=true"
+
+      # ---------------------------------------------------------------
+    # Runs code analysis with Jtest and generates a .sarif report.
+    - name: Run Parasoft Jtes
+      id: jtest
+      uses: parasoft/run-jtest-action@0.0.2
+      with:
+        # installDir: optional
+        # workingDir: optional
+        # testConfig: 'builtin://Recommended Rules' optional
+        # reportDir: 'reports' optional
+        # reportFormat: optional
+        input: 'target/jtest.data.json' # maven default location of jtest.data.json
+        # input: 'build/jtest.data.json' # gradle default location of jtest.data.json
+        #additionalParams: optional
+
+    # ---------------------------------------------------------------
+    # Uploads an archive that includes all report files (.xml, .html, .sarif).
+    - name: Upload report artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: Report files
+        path: reports/*.*
+
+    # ---------------------------------------------------------------
+    # Uploads analysis results in the SARIF format, so that they are displayed as GitHub code scanning alerts.
+    - name: Upload results to GitHub
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: reports/report.sarif
